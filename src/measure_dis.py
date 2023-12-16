@@ -161,10 +161,10 @@ def main():
         "FNLRNCTFMYTYNITEDEIL",
         "LIATVKKLTTPGKGLLA"
     ]
-    distances = 7 * torch.rand((20, 1))
+    distances = 7 * torch.rand((21, 1))
 
     # Convert sequences to numerical indices
-    char_to_index = {char: i for i, char in enumerate("ACDEFGHIKLMNPQRSTVWY")}
+    char_to_index = {char: i for i, char in enumerate("ACDEFGHIKLMNPQRSTVWYX")}
     sequences1 = [torch.tensor([char_to_index[char] for char in seq]) \
                     for seq in sequences1]
     sequences2 = [torch.tensor([char_to_index[char] for char in seq]) \
