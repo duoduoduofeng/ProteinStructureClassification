@@ -99,18 +99,7 @@ def evaluation(model, data_loader, criterion):
     return avg_loss
 
 
-
-def main():
-    # Some hyperparameters
-    split_rate = 0.8
-
-    learning_rate = 0.001
-    the_batch_size = 2
-    epoch_times = 5
-
-    the_embedding_dim = 64
-    the_hidden_dim = 64
-
+def generate_toy_example():
     # Dummy data
     # sequences1 = [torch.randint(0, 21, (20,)) for _ in range(20)]
     # sequences2 = [torch.randint(0, 21, (20,)) for _ in range(20)]
@@ -161,7 +150,72 @@ def main():
         "FNLRNCTFMYTYNITEDEIL",
         "LIATVKKLTTPGKGLLA"
     ]
+
     distances = 7 * torch.rand((21, 1))
+
+    return sequences1, sequences2, distances
+
+
+
+def load_dataset(dataset_file):
+    sequences1 = []
+    sequences2 = []
+    distances = []
+
+    print(f"The given dataset file is {dataset_file}.")
+
+    err_input_data_count = 0
+    row_num = 0
+    with open(dataset_file, 'r') as fin:
+        for line in fin:
+            row_num += 1
+            # tailor the head
+            if row_num < 2:
+                continue
+
+            parts = line.strip().split('\t')
+            if len(parts) == 7:
+                distances.append(int(parts[2]))
+                sequences1.append(parts[3])
+                sequences2.append(parts[4])
+            else:
+                err_input_data_count += 1
+        print(f"There are {err_input_data_count} error inputs \
+            in the given dataset file {dataset_file}.")
+
+    distances_tensor = torch.tensor(distances, dtype=torch.float32).view(-1, 1)
+    return sequences1, sequences2, distances_tensor
+
+
+
+def main():
+    dataset_file = "../generated_data/sample_proteins_dataset.txt"
+
+    # Some hyperparameters
+    split_rate = 0.8
+
+    learning_rate = 0.001
+
+    # toy examples
+    # the_batch_size = 2
+    # epoch_times = 5
+    
+    # real dataset
+    the_batch_size = 64
+    epoch_times = 100
+
+    the_embedding_dim = 64
+    the_hidden_dim = 64
+
+    # toy example
+    # sequences1, sequences2, distances = generate_toy_example()
+
+    # Load dataset
+    print(f"Start loading dataset from {dataset_file}")
+    sequences1, sequences2, distances = load_dataset(dataset_file)
+    print(f"Successfully loaded dataset with {len(sequences1)} sequences1, \
+        {len(sequences2)} sequences2, \
+        and {len(distances)} distances")
 
     # Convert sequences to numerical indices
     char_to_index = {char: i for i, char in enumerate("ACDEFGHIKLMNPQRSTVWYX")}
@@ -170,9 +224,9 @@ def main():
     sequences2 = [torch.tensor([char_to_index[char] for char in seq]) \
                     for seq in sequences2]
 
-    print(f"sequence1: {sequences1}\n")
-    print(f"sequence2: {sequences2}\n")
-    print(f"distances: {distances}\n")
+    # print(f"sequence1: {sequences1}\n")
+    # print(f"sequence2: {sequences2}\n")
+    # print(f"distances: {distances}\n")
 
     # Pad sequences
     # padded_sequences1 = pad_sequence(
