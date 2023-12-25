@@ -48,6 +48,7 @@ class ProteinDistanceModel(nn.Module):
             embedding_dim=embedding_dim)
 
         self.attention = Attention(hidden_dim)
+        # self.dropout = nn.Dropout(0.5)
         self.fc = nn.Linear(2 * hidden_dim, 1)
 
     def forward(self, seq1, seq2, distance):
@@ -62,11 +63,11 @@ class ProteinDistanceModel(nn.Module):
             attention_output_seq1, 
             attention_output_seq2), dim=1)
 
+        # concatenated_output = self.dropout(concatenated_output)
+
         # Predict distance
         pred_distance = self.fc(concatenated_output)
         return pred_distance
-
-
 
 
 # Pad sequences
@@ -183,14 +184,75 @@ def load_dataset(dataset_file):
         print(f"There are {err_input_data_count} error inputs \
             in the given dataset file {dataset_file}.")
 
+    # Convert sequences to numerical indices
+    char_to_index = {char: i for i, char in enumerate("ACDEFGHIKLMNPQRSTVWYX")}
+    sequences1 = [torch.tensor([char_to_index[char] for char in seq]) \
+                    for seq in sequences1]
+    sequences2 = [torch.tensor([char_to_index[char] for char in seq]) \
+                    for seq in sequences2]
+
     distances_tensor = torch.tensor(distances, dtype=torch.float32).view(-1, 1)
+    
+
     return sequences1, sequences2, distances_tensor
 
 
 
-def main():
-    dataset_file = "../generated_data/sample_proteins_dataset.txt"
+# This function is used to check the predict distance
+def load_test_data(dataset_file):
+    test_sets = []
+    
+    with open(dataset_file, 'r') as fin:
+        row_num = 0
+        field_names = []
+        for line in fin:
+            row_num += 1
 
+            cur_pro = {}
+            parts = line.strip().split('\t')
+            if row_num == 1:
+                field_names = parts
+                # print(f"Fields names: {field_names}")
+            else:
+                for i in range(0, len(parts)):
+                    cur_pro[field_names[i]] = parts[i]
+                cur_pro["distance"] = int(cur_pro["distance"])
+            test_sets.append(cur_pro)
+
+    sequences1 = []
+    sequences2 = []
+    distances = []
+    selected_test_set = []
+
+    for i in range(0, 10):
+        cur_record = test_sets[i * 100 + 1]
+        selected_test_set.append(cur_record)
+
+        distance = [cur_record["distance"]]
+        seq1 = cur_record["protein1_seq"]
+        seq2 = cur_record["protein2_seq"]
+
+        sequences1.append(seq1)
+        sequences2.append(seq2)
+        distances.append(distance)
+
+    # Convert sequences to numerical indices
+    char_to_index = {char: i for i, char in enumerate("ACDEFGHIKLMNPQRSTVWYX")}
+    sequences1 = [torch.tensor([char_to_index[char] for char in seq]) \
+                        for seq in sequences1]
+    sequences2 = [torch.tensor([char_to_index[char] for char in seq]) \
+                        for seq in sequences2]
+    # Pad sequences, which is necessary
+    sequences1 = pad_sequence(sequences1, batch_first=True)
+    sequences2 = pad_sequence(sequences2, batch_first=True)
+
+    real_dis_tensor = torch.tensor(distances, dtype=torch.float32).view(-1, 1)
+
+    return sequences1, sequences2, real_dis_tensor, selected_test_set
+
+
+
+def train(dataset_file):
     # Some hyperparameters
     split_rate = 0.8
 
@@ -202,13 +264,14 @@ def main():
     
     # real dataset
     the_batch_size = 64
-    epoch_times = 100
+    epoch_times = 50
 
-    the_embedding_dim = 64
-    the_hidden_dim = 64
+    the_embedding_dim = 128
+    the_hidden_dim = 128
 
     # toy example
     # sequences1, sequences2, distances = generate_toy_example()
+    # And reflects the chars into numbers, by the operations in function load_dataset()
 
     # Load dataset
     print(f"Start loading dataset from {dataset_file}")
@@ -216,26 +279,6 @@ def main():
     print(f"Successfully loaded dataset with {len(sequences1)} sequences1, \
         {len(sequences2)} sequences2, \
         and {len(distances)} distances")
-
-    # Convert sequences to numerical indices
-    char_to_index = {char: i for i, char in enumerate("ACDEFGHIKLMNPQRSTVWYX")}
-    sequences1 = [torch.tensor([char_to_index[char] for char in seq]) \
-                    for seq in sequences1]
-    sequences2 = [torch.tensor([char_to_index[char] for char in seq]) \
-                    for seq in sequences2]
-
-    # print(f"sequence1: {sequences1}\n")
-    # print(f"sequence2: {sequences2}\n")
-    # print(f"distances: {distances}\n")
-
-    # Pad sequences
-    # padded_sequences1 = pad_sequence(
-    #     sequences1, 
-    #     batch_first=True)
-    # padded_sequences2 = pad_sequence(
-    #     sequences2, 
-    #     batch_first=True)
-    # print(f"=************= Pad the sequences by library.\n")
 
     # Create dataset and DataLoader
     dataset = ProteinDataset(sequences1, sequences2, distances)
@@ -286,9 +329,44 @@ def main():
         print(f"Epoch {epoch + 1}, Test Loss: {avg_loss:.4f}")
 
     print(f"=************= Finished training.........\n")
+    return model
+
+
+
+def predict(dataset_file, model):
+    print(f"=************= Start predicting...")
+    ### Prediction
+    # Set the model to evaluation mode (important if you have dropout layers)
+    # model.eval()
+
+    sequences1, sequences2, real_dis_tensor, selected_test_set = load_test_data(dataset_file)
+
+    # Make predictions
+    with torch.no_grad():
+        # sequences1 = torch.stack(sequences1, dim = 0)
+        # sequences2 = torch.tensor(sequences2, dtype=torch.long)
+        predictions = model(sequences1, sequences2, real_dis_tensor)
+        predict_distances = predictions.tolist()
+        print(f"Precited distances: {predict_distances}")
+
+    print(f"protein1_pdb\tprotein2_pdb\tprotein1_classification\tprotein2_classfication\treal_distance\tpredict_distance")
+    for i in range(0, len(selected_test_set)):
+        cur_record = selected_test_set[i]
+        pro1 = cur_record["protein1_pdb"]
+        pro2 = cur_record["protein2_pdb"]
+        pro1_class = cur_record["protein1_classification"]
+        pro2_class = cur_record["protein2_classfication"]
+        real_distance = [cur_record["distance"]]
+        predict_distance = predict_distances[i]
+        print(f"{pro1}\t{pro2}\t{pro1_class}\t{pro2_class}\t{real_distance}\t{predict_distance}")
+
+    print(f"Finished predicting.")
+
 
 
 if __name__ == "__main__":
-    main()
+    dataset_file = "../generated_data/sample_proteins_dataset.txt"
+    themodel = train(dataset_file)
+    predict(dataset_file, themodel)
 
 
