@@ -48,8 +48,16 @@ class ProteinDistanceModel(nn.Module):
             embedding_dim=embedding_dim)
 
         self.attention = Attention(hidden_dim)
-        # self.dropout = nn.Dropout(0.5)
-        self.fc = nn.Linear(2 * hidden_dim, 1)
+
+        self.fc1 = nn.Linear(2 * hidden_dim, 256)
+        self.relu1 = nn.ReLU()
+        self.dropout1 = nn.Dropout(0.5)
+        
+        self.fc2 = nn.Linear(256, 128)
+        self.relu2 = nn.ReLU()
+        self.dropout2 = nn.Dropout(0.5)
+        
+        self.fc3 = nn.Linear(128, 1)
 
     def forward(self, seq1, seq2, distance):
         embedded_seq1 = self.embedding(seq1)
@@ -63,10 +71,19 @@ class ProteinDistanceModel(nn.Module):
             attention_output_seq1, 
             attention_output_seq2), dim=1)
 
-        # concatenated_output = self.dropout(concatenated_output)
+        x = self.fc1(concatenated_output)
+        x = self.relu1(x)
+        x = self.dropout1(x)
+        
+        x = self.fc2(x)
+        x = self.relu2(x)
+        x = self.dropout2(x)
 
         # Predict distance
-        pred_distance = self.fc(concatenated_output)
+        
+        pred_distance = self.fc3(x)
+        # The logstic regression doesn't help here. (distance between 0 and 1)
+        # pred_distance = torch.sigmoid(self.fc3(x))
         return pred_distance
 
 
@@ -176,7 +193,7 @@ def load_dataset(dataset_file):
 
             parts = line.strip().split('\t')
             if len(parts) == 7:
-                distances.append(int(parts[2]))
+                distances.append(float(parts[2]))
                 sequences1.append(parts[3])
                 sequences2.append(parts[4])
             else:
@@ -185,7 +202,9 @@ def load_dataset(dataset_file):
             in the given dataset file {dataset_file}.")
 
     # Convert sequences to numerical indices
-    char_to_index = {char: i for i, char in enumerate("ACDEFGHIKLMNPQRSTVWYX")}
+    abbrs = "ACDEFGHIKLMNPQRSTVWYX"
+    char_to_index = {char: i for i, char in enumerate(abbrs)}
+    print(f"char_to_index: {char_to_index}")
     sequences1 = [torch.tensor([char_to_index[char] for char in seq]) \
                     for seq in sequences1]
     sequences2 = [torch.tensor([char_to_index[char] for char in seq]) \
@@ -216,7 +235,7 @@ def load_test_data(dataset_file):
             else:
                 for i in range(0, len(parts)):
                     cur_pro[field_names[i]] = parts[i]
-                cur_pro["distance"] = int(cur_pro["distance"])
+                cur_pro["distance"] = float(cur_pro["distance"])
             test_sets.append(cur_pro)
 
     sequences1 = []
@@ -228,7 +247,7 @@ def load_test_data(dataset_file):
         cur_record = test_sets[i * 100 + 1]
         selected_test_set.append(cur_record)
 
-        distance = [cur_record["distance"]]
+        distance = cur_record["distance"]
         seq1 = cur_record["protein1_seq"]
         seq2 = cur_record["protein2_seq"]
 
@@ -237,7 +256,8 @@ def load_test_data(dataset_file):
         distances.append(distance)
 
     # Convert sequences to numerical indices
-    char_to_index = {char: i for i, char in enumerate("ACDEFGHIKLMNPQRSTVWYX")}
+    abbrs = "ACDEFGHIKLMNPQRSTVWYX"
+    char_to_index = {char: i for i, char in enumerate(abbrs)}
     sequences1 = [torch.tensor([char_to_index[char] for char in seq]) \
                         for seq in sequences1]
     sequences2 = [torch.tensor([char_to_index[char] for char in seq]) \
@@ -264,7 +284,7 @@ def train(dataset_file):
     
     # real dataset
     the_batch_size = 64
-    epoch_times = 50
+    epoch_times = 600
 
     the_embedding_dim = 128
     the_hidden_dim = 128
@@ -347,18 +367,19 @@ def predict(dataset_file, model):
         # sequences2 = torch.tensor(sequences2, dtype=torch.long)
         predictions = model(sequences1, sequences2, real_dis_tensor)
         predict_distances = predictions.tolist()
-        print(f"Precited distances: {predict_distances}")
+        # print(f"Precited distances: {predict_distances}")
 
-    print(f"protein1_pdb\tprotein2_pdb\tprotein1_classification\tprotein2_classfication\treal_distance\tpredict_distance")
+    print(f"protein1_pdb\tprotein2_pdb\tprotein1_classification\tprotein2_classfication\treal_distance\tpredict_distance\tdiff")
     for i in range(0, len(selected_test_set)):
         cur_record = selected_test_set[i]
         pro1 = cur_record["protein1_pdb"]
         pro2 = cur_record["protein2_pdb"]
         pro1_class = cur_record["protein1_classification"]
         pro2_class = cur_record["protein2_classfication"]
-        real_distance = [cur_record["distance"]]
+        real_distance = cur_record["distance"]
         predict_distance = predict_distances[i]
-        print(f"{pro1}\t{pro2}\t{pro1_class}\t{pro2_class}\t{real_distance}\t{predict_distance}")
+        diff = predict_distance[0] - real_distance
+        print(f"{pro1}\t{pro2}\t{pro1_class}\t{pro2_class}\t{real_distance}\t{predict_distance}\t{diff}")
 
     print(f"Finished predicting.")
 

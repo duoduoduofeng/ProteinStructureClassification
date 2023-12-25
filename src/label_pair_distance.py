@@ -58,20 +58,20 @@ def parse_class_info(protein_info_file, sample_protein_file):
 
 
 def measure_distance(cl1, cl2):
-	distance = 16
+	distance = 1
 
 	if cl1["repre_id"] == cl2["repre_id"]:
 		distance = 0
 	elif cl1["FA"] == cl2["FA"]:
-		distance = 1
+		distance = 1/16
 	elif cl1["SF"] == cl2["SF"]:
-		distance = 2
+		distance = 2/16
 	elif cl1["CF"] == cl2["CF"]:
-		distance = 4
+		distance = 4/16
 	elif cl1["CL"] == cl2["CL"]:
-		distance = 8
+		distance = 8/16
 	elif cl1["TP"] == cl2["TP"]:
-		distance = 8
+		distance = 8/16
 
 	return distance
 
@@ -94,7 +94,7 @@ def build_dataset(sample_proteins, sample_protein_info, dataset_file, cut_percen
 
 		pair_key = f"{pro1}||{pro2}"
 
-		if distance == 8:
+		if distance == 8/16:
 			dis_8_dict[pair_key] = distance
 		else:
 			dis_dict[pair_key] = distance
