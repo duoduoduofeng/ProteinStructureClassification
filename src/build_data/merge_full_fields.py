@@ -41,14 +41,14 @@ def merge_files(proteins_file, cla_file, merged_data_file):
 
 meta_info = [
     {
-        "filename": "../data/scop-represented-structures-latest.txt",
+        "filename": "../../data/scop-represented-structures-latest.txt",
         "start_row_num": 7,
         "fields_count": 3,
         "head": "DOMID REPRESENTED-PDBID REPRESENTED-PDBCHAIN",
         "example": "8000061 2DT5 B"
     },
     {
-        "filename": "../data/scop-cla-latest.txt",
+        "filename": "../../data/scop-cla-latest.txt",
         "start_row_num": 7,
         "fields_count": 11,
         "head": "FA-DOMID FA-PDBID FA-PDBREG FA-UNIID FA-UNIREG SF-DOMID SF-PDBID SF-PDBREG SF-UNIID SF-UNIREG SCOPCLA",
@@ -56,5 +56,5 @@ meta_info = [
     }
 ]
 
-merged_data_file_name = "../generated_data/scop-protein-whole-info.txt"
+merged_data_file_name = "../../generated_data/scop-protein-whole-info.txt"
 merge_files(meta_info[0], meta_info[1], merged_data_file_name)

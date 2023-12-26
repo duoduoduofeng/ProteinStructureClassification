@@ -132,9 +132,9 @@ def build_dataset(sample_proteins, sample_protein_info, dataset_file, cut_percen
 
 
 def main():
-	protein_info_file = "../generated_data/scop-protein-whole-info.txt"
-	sample_protein_file = "../generated_data/protein_samples_seq.txt"
-	dataset_file = "../generated_data/sample_proteins_dataset.txt"
+	protein_info_file = "../../generated_data/scop-protein-whole-info.txt"
+	sample_protein_file = "../../generated_data/protein_samples_seq.txt"
+	dataset_file = "../../generated_data/sample_proteins_dataset.txt"
 	cut_percent = 0.04
 	theseed = 2023
 

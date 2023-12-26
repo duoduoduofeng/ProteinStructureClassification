@@ -88,9 +88,9 @@ def toy_example_main():
 
 
 def main():
-    input_file = "../generated_data/scop-fa-sample.txt"
-    output_file = "../generated_data/protein_samples_seq.txt"
-    err_file = "../generated_data/protein_samples_err.txt"
+    input_file = "../../generated_data/scop-fa-sample.txt"
+    output_file = "../../generated_data/protein_samples_seq.txt"
+    err_file = "../../generated_data/protein_samples_err.txt"
 
     sample_proteins_list = load_proteins(input_file)
 

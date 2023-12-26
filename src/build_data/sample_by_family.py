@@ -210,9 +210,9 @@ def sample_pros_by_family(sorted_fa_pros):
 if __name__ == "__main__":
 	random.seed(42)
 
-	protein_file_name = "../generated_data/scop-protein-whole-info.txt"
-	count_file_name = "../generated_data/scop-fa-stat.txt"
-	sampled_fa_pros_file_name = "../generated_data/scop-fa-sample.txt"
+	protein_file_name = "../../generated_data/scop-protein-whole-info.txt"
+	count_file_name = "../../generated_data/scop-fa-stat.txt"
+	sampled_fa_pros_file_name = "../../generated_data/scop-fa-sample.txt"
 	
 	sorted_fa_pros = count_family(protein_file_name)
 	dump_fa_pros(sorted_fa_pros, count_file_name)
