@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import sys
 from Bio import PDB
 from io import StringIO
 
@@ -87,13 +88,8 @@ def toy_example_main():
             print(f"No sequence found for PDB ID {pdb_id}, Chain ID {chain_id}.")
 
 
-def main():
-    input_file = "../../generated_data/scop-fa-sample.txt"
-    output_file = "../../generated_data/protein_samples_seq.txt"
-    err_file = "../../generated_data/protein_samples_err.txt"
-
+def main(input_file, output_file, err_file):
     sample_proteins_list = load_proteins(input_file)
-
 
     with open(output_file, 'w') as fout:
         with open(err_file, 'w') as ferr:
@@ -118,4 +114,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    input_file = sys.argv[1]
+    output_file = sys.argv[2]
+    err_file = sys.argv[3]
+
+    main(input_file, output_file, err_file)

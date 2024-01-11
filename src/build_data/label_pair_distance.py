@@ -3,6 +3,7 @@ import json
 from itertools import combinations
 import random
 import math
+import sys
 
 
 # narrow the protein info parsing objective into the sample proteins
@@ -76,7 +77,7 @@ def measure_distance(cl1, cl2):
 	return distance
 
 
-def build_dataset(sample_proteins, sample_protein_info, dataset_file, cut_percent, theseed = None):
+def build_dataset(sample_proteins, sample_protein_info, dataset_file, cut_percent, theseed = 2023):
 	thekeys = list(sample_proteins.keys())
 
 	# get all 2-item combination
@@ -102,13 +103,13 @@ def build_dataset(sample_proteins, sample_protein_info, dataset_file, cut_percen
 	# Sample the pairs in the same class/protein type (distance = 8)
 	random.seed(theseed)
 	dis_8_count = len(dis_8_dict)
-	print(f"Before sampling, there are {dis_8_count} protein pairs with distance 8 in total.")
+	print(f"Before sampling, there are {dis_8_count} protein pairs with distance 8/16 in total.")
 	
 	cut_size = math.floor(dis_8_count * cut_percent)
 	sampled_items = random.sample(list(dis_8_dict.items()), cut_size)
 	# Convert the sampled items back to a dictionary
 	sampled_dis_8_dict = dict(sampled_items)
-	print(f"After sampling, there are {len(sampled_dis_8_dict)} protein pairs with distance 8 in total.")
+	print(f"After sampling, there are {len(sampled_dis_8_dict)} protein pairs with distance 8/16 in total.")
 
 	# save dataset
 	excluded_pair_count = 0
@@ -131,22 +132,60 @@ def build_dataset(sample_proteins, sample_protein_info, dataset_file, cut_percen
 		print(f"******* There are {excluded_pair_count} protein pairs excluded in total.")
 
 
-def main():
-	protein_info_file = "../../generated_data/scop-protein-whole-info.txt"
-	sample_protein_file = "../../generated_data/protein_samples_seq.txt"
-	dataset_file = "../../generated_data/sample_proteins_dataset.txt"
+# Split out a validation set from the whole dataset. 
+def exclude_validate_set(whole_dataset_file, model_dataset_file, validate_dataset_file, validate_set_rate, theseed = 2023):
+	# validate set row numbers
+    validate_set_rows = []
+    with open(whole_dataset_file, 'r') as fin:
+        row_count = sum(1 for line in fin)
+    validate_size = int(validate_set_rate * row_count)
+    random.seed(theseed)
+    validate_set_rows = random.sample(range(2, row_count+1), validate_size)
+    print(f"There are {row_count} rows in {whole_dataset_file}, split {validate_size} rows into the {validate_dataset_file}")
+
+    with open(whole_dataset_file, 'r') as fin, \
+    	open(model_dataset_file, 'w') as model_fout, \
+    	open(validate_dataset_file, 'w') as validate_fout:
+    	row_num = 0
+    	for line in fin:
+    		row_num += 1
+    		if row_num == 1:
+    			model_fout.write(line)
+    			validate_fout.write(line)
+    			continue
+    		if row_num in validate_set_rows:
+    			validate_fout.write(line)
+    		else:
+    			model_fout.write(line)
+
+    print(f"Fininshed spliting validation set.")
+
+
+def main(protein_info_file, sample_protein_file, whole_dataset_file, \
+	model_dataset_file, validate_dataset_file, theseed):
+
 	cut_percent = 0.04
-	theseed = 2023
+	validate_set_rate = 0.1
 
 
 	sample_proteins, sample_protein_info = \
 		parse_class_info(protein_info_file, sample_protein_file)
 	# print(f"{json.dumps(sample_proteins)}\n\n{json.dumps(sample_protein_info)}")
 
-	build_dataset(sample_proteins, sample_protein_info, dataset_file, cut_percent, theseed)
+	build_dataset(sample_proteins, sample_protein_info, 
+		whole_dataset_file, cut_percent, theseed)
+	
+	exclude_validate_set(whole_dataset_file, model_dataset_file, 
+		validate_dataset_file, validate_set_rate, theseed)
 
 
 
 if __name__ == "__main__":
-    main()
+	protein_info_file = sys.argv[1]
+	sample_protein_file = sys.argv[2]
+	whole_dataset_file = sys.argv[3]
+	model_dataset_file = sys.argv[4]
+	validate_dataset_file = sys.argv[5]
+	theseed = int(sys.argv[6])
 
+	main(protein_info_file, sample_protein_file, whole_dataset_file, model_dataset_file, validate_dataset_file, theseed)

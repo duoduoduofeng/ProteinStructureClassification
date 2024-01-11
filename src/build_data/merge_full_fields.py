@@ -1,4 +1,4 @@
-#!/bin/usr
+import sys
 
 def merge_files(proteins_file, cla_file, merged_data_file):
 
@@ -56,5 +56,6 @@ meta_info = [
     }
 ]
 
-merged_data_file_name = "../../generated_data/scop-protein-whole-info.txt"
-merge_files(meta_info[0], meta_info[1], merged_data_file_name)
+if __name__ == "__main__":
+    merged_data_file_name = sys.argv[1]
+    merge_files(meta_info[0], meta_info[1], merged_data_file_name)

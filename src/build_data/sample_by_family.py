@@ -1,4 +1,3 @@
-#!/bin/usr
 
 # {
 # 	"family_id": { # 4000088
@@ -13,6 +12,8 @@
 import json
 import math
 import random
+import sys
+
 
 def count_family(protein_file):
 	row_num = 0
@@ -168,16 +169,16 @@ def sample_pros_by_family(sorted_fa_pros):
 	threshold = 100
 
 	repre_pro_threshold = 10
-	family_sample_rate = 0.1
+	family_sample_rate = 0.2
 
-	repre_sample_rate = 0.3
+	repre_sample_rate = 0.4
 	repre_sample_size_threshold = 4
 
-	pro_sample_rate = 0.3
+	pro_sample_rate = 0.4
 	pro_sample_size_threshold = 4
 
 	count_gt = 0
-	fa_pros_sample_size = 25
+	fa_pros_sample_size = 45
 	sampled_fas = {}
 
 	pros = sorted_fa_pros.items()
@@ -208,11 +209,12 @@ def sample_pros_by_family(sorted_fa_pros):
 
 
 if __name__ == "__main__":
-	random.seed(42)
+	protein_file_name = sys.argv[1]
+	count_file_name = sys.argv[2]
+	sampled_fa_pros_file_name = sys.argv[3]
 
-	protein_file_name = "../../generated_data/scop-protein-whole-info.txt"
-	count_file_name = "../../generated_data/scop-fa-stat.txt"
-	sampled_fa_pros_file_name = "../../generated_data/scop-fa-sample.txt"
+	theseed = int(sys.argv[4])
+	random.seed(theseed)
 	
 	sorted_fa_pros = count_family(protein_file_name)
 	dump_fa_pros(sorted_fa_pros, count_file_name)

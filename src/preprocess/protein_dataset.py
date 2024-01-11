@@ -142,6 +142,9 @@ def load_dataset(dataset_file):
 # This function is used to check the predict distance
 def load_test_data(dataset_file):
     test_sets = []
+    sequences1 = []
+    sequences2 = []
+    distances = []
     
     with open(dataset_file, 'r') as fin:
         row_num = 0
@@ -153,29 +156,21 @@ def load_test_data(dataset_file):
             parts = line.strip().split('\t')
             if row_num == 1:
                 field_names = parts
-                # print(f"Fields names: {field_names}")
+                continue
             else:
                 for i in range(0, len(parts)):
                     cur_pro[field_names[i]] = parts[i]
                 cur_pro["distance"] = float(cur_pro["distance"])
+            
             test_sets.append(cur_pro)
 
-    sequences1 = []
-    sequences2 = []
-    distances = []
-    selected_test_set = []
+            distance = cur_pro["distance"]
+            seq1 = cur_pro["protein1_seq"]
+            seq2 = cur_pro["protein2_seq"]
 
-    for i in range(0, 10):
-        cur_record = test_sets[i * 100 + 10]
-        selected_test_set.append(cur_record)
-
-        distance = cur_record["distance"]
-        seq1 = cur_record["protein1_seq"]
-        seq2 = cur_record["protein2_seq"]
-
-        sequences1.append(seq1)
-        sequences2.append(seq2)
-        distances.append(distance)
+            sequences1.append(seq1)
+            sequences2.append(seq2)
+            distances.append(distance)
 
     # Convert sequences to numerical indices
     abbrs = "ACDEFGHIKLMNPQRSTVWYX"
@@ -190,4 +185,4 @@ def load_test_data(dataset_file):
 
     real_dis_tensor = torch.tensor(distances, dtype=torch.float32).view(-1, 1)
 
-    return sequences1, sequences2, real_dis_tensor, selected_test_set
+    return sequences1, sequences2, real_dis_tensor, test_sets
