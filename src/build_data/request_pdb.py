@@ -94,7 +94,7 @@ def main(input_file, output_file, err_file):
     with open(output_file, 'w') as fout:
         with open(err_file, 'w') as ferr:
             for pdb_id, chain_id in sample_proteins_list:
-                time.sleep(1)
+                time.sleep(0.2)
                 protein_sequence = get_protein_sequence(pdb_id, chain_id)
                 
                 if "Failed for pdb_id" not in protein_sequence:
@@ -102,7 +102,7 @@ def main(input_file, output_file, err_file):
                     print(f"Protein Sequence obtained for PDB ID {pdb_id}, Chain ID {chain_id}.")
                 else:
                     # retry
-                    time.sleep(3)
+                    time.sleep(1)
                     protein_sequence_2 = get_protein_sequence(pdb_id, chain_id)
                     if "Failed for pdb_id" not in protein_sequence_2:
                         fout.write(protein_sequence_2)
