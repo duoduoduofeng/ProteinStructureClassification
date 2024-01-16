@@ -326,5 +326,7 @@ if __name__ == "__main__":
 	# awk -F '\t' '{print $3}' sample_proteins_dataset.train.txt | sort | uniq -c
 	train_set_file = "../../generated_data/whole_pdbs/datasets/try_tp_4/sample_proteins_dataset.train.txt"
 	build_pair(reserved_proteins, train_keys, seqs, train_set_file)
+	validate_set_file = "../../generated_data/whole_pdbs/datasets/try_tp_4/sample_proteins_dataset.validate.txt"
+	build_pair(reserved_proteins, validate_keys, seqs, validate_set_file)
 
 
