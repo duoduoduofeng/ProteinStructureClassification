@@ -12,12 +12,12 @@ from model.process import *
 
 
 if __name__ == "__main__":
-    #common_path = "../generated_data/whole_pdbs/datasets/try_tp_3"
-    common_path = "../generated_data/train"
+    common_path = "../generated_data/whole_pdbs/datasets/try_tp_3"
+    # common_path = "../generated_data/train"
     
     ### 1. Training
     dataset_file = f"{common_path}/data/sample_proteins_dataset.train.txt"
-    epoch_times = 500
+    epoch_times = 10
 
     timestamp = time.time()
     datetime_object = datetime.fromtimestamp(timestamp)

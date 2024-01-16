@@ -33,7 +33,7 @@ def train(dataset_file, model_save_file, train_log, epoch_times, device):
     # epoch_times = 5
     
     # real dataset
-    the_batch_size = 64
+    the_batch_size = 128
 
     the_embedding_dim = 128
     the_hidden_dim = 128
