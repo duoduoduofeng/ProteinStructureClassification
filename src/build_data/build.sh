@@ -13,7 +13,8 @@ protein_file_name="../../generated_data/scop-protein-whole-info.txt"
 count_file_name="../../generated_data/$mode/scop-fa-stat.txt"
 sampled_fa_pros_file_name="../../generated_data/$mode/scop-fa-sample.txt"
 # theseed=42
-theseed=102
+# theseed=102
+theseed=1018
 
 python3 sample_by_family.py $protein_file_name $count_file_name $sampled_fa_pros_file_name $theseed
 

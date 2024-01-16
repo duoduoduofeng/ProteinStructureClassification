@@ -56,6 +56,7 @@ meta_info = [
     }
 ]
 
+
 if __name__ == "__main__":
     merged_data_file_name = sys.argv[1]
     merge_files(meta_info[0], meta_info[1], merged_data_file_name)
