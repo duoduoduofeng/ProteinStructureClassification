@@ -27,7 +27,7 @@ if __name__ == "__main__":
     train_log = f"{common_path}/logs/train.log.{dt_object}"
     print(f"model_save_file: {model_save_file}, \ntrain_log: {train_log}\n")
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("Using device:", device)
 
     train(dataset_file, model_save_file, train_log, epoch_times, device)
