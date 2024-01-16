@@ -130,9 +130,11 @@ def stat_lineage(reserved_proteins):
 """
 Sample the ranged proteins.
 """
-def sample_prots(reserved_proteins, repre_num_threshold = 5, nodename = "TP", node_threshold = "4"):
+def sample_prots(reserved_proteins, repre_num_threshold = 5, nodename = "TP", node_threshold = "4", theseed = 2024):
 	repre_prot_dict = {}
 	prots_count = 0
+	random.seed(theseed)
+
 	for thekey in reserved_proteins:
 		info = reserved_proteins[thekey]
 		
@@ -313,7 +315,8 @@ if __name__ == "__main__":
 
 	### Step 4, sample the proteins, mainly sample by representatives.
 	train_keys, validate_keys, excluded_validate_keys = \
-		sample_prots(reserved_proteins, repre_num_threshold = 5, nodename = "TP", node_threshold = "3")
+		sample_prots(reserved_proteins, repre_num_threshold = 5, nodename = "TP", 
+			node_threshold = "3", theseed = 2024)
 
 	### Step 5, load the sequences
 	sequences_file_dir = "../../generated_data/whole_pdbs/sequences"
