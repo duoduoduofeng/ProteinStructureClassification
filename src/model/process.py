@@ -63,13 +63,13 @@ def train(dataset_file, model_save_file, train_log, epoch_times, device):
         train_dataset, 
         batch_size=the_batch_size, 
         shuffle=True, 
-        collate_fn=pad_collate, 
+        collate_fn=lambda batch: pad_collate(batch, device),
         pin_memory=True)
     test_loader = DataLoader(
         test_dataset, 
         batch_size=the_batch_size, 
         shuffle=False, 
-        collate_fn=pad_collate, 
+        collate_fn=lambda batch: pad_collate(batch, device), 
         pin_memory=True)
     print(f"=************= Load datasets, assigned pading function.\n")
 

@@ -23,14 +23,14 @@ class ProteinDataset(torch.utils.data.Dataset):
 
 
 # Pad sequences
-def pad_collate(batch):
+def pad_collate(batch, device):
     seq1, seq2, distances = zip(*batch)
     # print(f"New: Original data: seq1 = {seq1}, \
     #     \nseq2 = {seq2}, \ndistances = {distances}\n")
 
-    pad_seq1 = pad_sequence(seq1, batch_first=True)
-    pad_seq2 = pad_sequence(seq2, batch_first=True)
-    transferred_dist = torch.stack(distances)
+    pad_seq1 = pad_sequence(seq1, batch_first=True).to(device)
+    pad_seq2 = pad_sequence(seq2, batch_first=True).to(device)
+    transferred_dist = torch.stack(distances).to(device)
     
     # print(f"Padded data: (1)shape: \
     #     seq1: {pad_seq1.size()}, seq2: {pad_seq2.size()}\n\
