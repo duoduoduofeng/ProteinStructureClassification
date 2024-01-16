@@ -22,7 +22,7 @@ def evaluation(model, data_loader, criterion):
     return avg_loss
 
 
-def train(dataset_file, model_save_file, train_log, epoch_times):
+def train(dataset_file, model_save_file, train_log, epoch_times, device):
     # Some hyperparameters
     split_rate = 0.8
 
@@ -63,18 +63,20 @@ def train(dataset_file, model_save_file, train_log, epoch_times):
         train_dataset, 
         batch_size=the_batch_size, 
         shuffle=True, 
-        collate_fn=pad_collate)
+        collate_fn=pad_collate, 
+        pin_memory=True)
     test_loader = DataLoader(
         test_dataset, 
         batch_size=the_batch_size, 
         shuffle=False, 
-        collate_fn=pad_collate)
+        collate_fn=pad_collate, 
+        pin_memory=True)
     print(f"=************= Load datasets, assigned pading function.\n")
 
     # Initialize the model
     model = ProteinDistanceModel(
         embedding_dim=the_embedding_dim, 
-        hidden_dim=the_hidden_dim)
+        hidden_dim=the_hidden_dim).to(device)
     print(f"=************= Initialize model.\n")
 
     # Define loss function and optimizer
@@ -89,7 +91,7 @@ def train(dataset_file, model_save_file, train_log, epoch_times):
             model.train()
             for seq1, seq2, distance in train_loader:
                 optimizer.zero_grad()
-                pred_distance = model(seq1, seq2, distance)
+                pred_distance = model(seq1.to(device), seq2.to(device), distance.to(device))
                 loss = criterion(pred_distance, distance)
                 loss.backward()
                 optimizer.step()

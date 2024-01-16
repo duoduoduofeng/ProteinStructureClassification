@@ -12,7 +12,8 @@ from model.process import *
 
 
 if __name__ == "__main__":
-    common_path = "../generated_data/whole_pdbs/datasets/try_tp_3"
+    #common_path = "../generated_data/whole_pdbs/datasets/try_tp_3"
+    common_path = "../generated_data/train"
     
     ### 1. Training
     dataset_file = f"{common_path}/data/sample_proteins_dataset.train.txt"
@@ -26,7 +27,10 @@ if __name__ == "__main__":
     train_log = f"{common_path}/logs/train.log.{dt_object}"
     print(f"model_save_file: {model_save_file}, \ntrain_log: {train_log}\n")
 
-    train(dataset_file, model_save_file, train_log, epoch_times)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("Using device:", device)
+
+    train(dataset_file, model_save_file, train_log, epoch_times, device)
 
     ### 2. Prediction
     validate_dataset_file = "{common_path}/data/sample_proteins_dataset.validate.txt"
