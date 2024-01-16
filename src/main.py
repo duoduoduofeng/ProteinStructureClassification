@@ -17,7 +17,7 @@ if __name__ == "__main__":
     
     ### 1. Training
     dataset_file = f"{common_path}/data/sample_proteins_dataset.train.txt"
-    epoch_times = 2
+    epoch_times = 400
 
     timestamp = time.time()
     datetime_object = datetime.fromtimestamp(timestamp)
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("Using device:", device)
-    the_batch_size = 512
+    the_batch_size = 1024
     train(dataset_file, model_save_file, train_log, epoch_times, the_batch_size, device)
 
     ### 2. Prediction
