@@ -111,8 +111,7 @@ def train(dataset_file, model_save_file, train_log, epoch_times = 10, the_batch_
 
 
 
-# def predict(model_save_file, dataset_file, predict_result_file, device = "cpu"):
-def predict(model_save_file, dataset_file, predict_result_file):
+def predict(model_save_file, dataset_file, predict_result_file, device = "cpu"):
     print(f"=************= Start predicting...\n")
 
     the_embedding_dim = 128
@@ -123,13 +122,12 @@ def predict(model_save_file, dataset_file, predict_result_file):
         embedding_dim=the_embedding_dim, 
         hidden_dim=the_hidden_dim)
     
-    # if device == "cpu":
-    #     model.load_state_dict(torch.load(model_save_file, map_location=torch.device(device)))
-    #     print(f"Loaded the trained model on cpu successfully.\n")
-    # else:
-    
-    model.load_state_dict(torch.load(model_save_file))
-    print(f"Loaded the trained model on gpu successfully.\n")
+    if device == "cpu":
+        model.load_state_dict(torch.load(model_save_file, map_location=torch.device(device)))
+        print(f"Loaded the trained model on cpu successfully.\n")
+    else:
+        model.load_state_dict(torch.load(model_save_file))
+        print(f"Loaded the trained model on gpu successfully.\n")
 
     model.eval()
 
@@ -206,11 +204,11 @@ def batch_predict(model_save_file, dataset_file, predict_result_file, device = "
         fout.write(f"protein1_pdb\tprotein2_pdb\tprotein1_classification\tprotein2_classfication\treal_distance\tpredict_distance\tdiff\n")
         info_index = 0
         for seq1, seq2, distance in validate_loader:
+            print(f"Start new batch predicting.")
             predictions = model(seq1.to(device), seq2.to(device), distance.to(device))
             predict_distances = predictions.tolist()
 
             for i in range(0, len(predict_distances)):
-                info_index += 1
                 cur_record = test_sets[i]
                 pro1 = cur_record["protein1_pdb"]
                 pro2 = cur_record["protein2_pdb"]
@@ -223,6 +221,8 @@ def batch_predict(model_save_file, dataset_file, predict_result_file, device = "
                 line = f"{pro1}\t{pro2}\t{pro1_class}\t{pro2_class}\t{real_distance}\t{predict_distance}\t{diff}"
                 print(line)
                 fout.write(f"{line}\n")
+
+                info_index += 1
 
     print(f"\n=************= Finished predicting.\n")
 
