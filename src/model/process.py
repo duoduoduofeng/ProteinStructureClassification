@@ -112,7 +112,7 @@ def train(dataset_file, model_save_file, train_log, epoch_times = 10, the_batch_
 
 
 def predict(model_save_file, dataset_file, predict_result_file, the_device = "cpu"):
-    print(f"=************= Start predicting...\n")
+    print(f"=************= Start predicting... on {the_device}\n")
 
     the_embedding_dim = 128
     the_hidden_dim = 128
