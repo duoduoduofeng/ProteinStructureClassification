@@ -17,7 +17,7 @@ if __name__ == "__main__":
     
     ### 1. Training
     dataset_file = f"{common_path}/data/sample_proteins_dataset.train.txt"
-    epoch_times = 40
+    epoch_times = 10
 
     timestamp = time.time()
     datetime_object = datetime.fromtimestamp(timestamp)
@@ -38,4 +38,5 @@ if __name__ == "__main__":
     #model_save_file = f"{common_path}/models/trained_model.dict.20240111_024648"
 
     predict_result_file = f"{common_path}/result/predict_result.txt"
-    predict(model_save_file, validate_dataset_file, predict_result_file, device)
+    # predict(model_save_file, validate_dataset_file, predict_result_file, device)
+    predict(model_save_file, validate_dataset_file, predict_result_file)
