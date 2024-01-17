@@ -111,7 +111,7 @@ def train(dataset_file, model_save_file, train_log, epoch_times = 10, the_batch_
 
 
 
-def predict(model_save_file, dataset_file, predict_result_file):
+def predict(model_save_file, dataset_file, predict_result_file, device = "cpu"):
     print(f"=************= Start predicting...\n")
 
     the_embedding_dim = 128
@@ -121,8 +121,12 @@ def predict(model_save_file, dataset_file, predict_result_file):
     model = ProteinDistanceModel(
         embedding_dim=the_embedding_dim, 
         hidden_dim=the_hidden_dim)
-    model.load_state_dict(torch.load(model_save_file))
-    print(f"Loaded the trained model successfully.\n")
+    if device == "cpu":
+        model.load_state_dict(torch.load(model_save_file, map_location=torch.device('cpu')))
+        print(f"Loaded the trained model on cpu successfully.\n")
+    else:
+        model.load_state_dict(torch.load(model_save_file))
+        print(f"Loaded the trained model on gpu successfully.\n")
 
     model.eval()
 
