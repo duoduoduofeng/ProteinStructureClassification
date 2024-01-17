@@ -17,7 +17,7 @@ if __name__ == "__main__":
     
     ### 1. Training
     dataset_file = f"{common_path}/data/sample_proteins_dataset.train.txt"
-    epoch_times = 400
+    epoch_times = 40
 
     timestamp = time.time()
     datetime_object = datetime.fromtimestamp(timestamp)

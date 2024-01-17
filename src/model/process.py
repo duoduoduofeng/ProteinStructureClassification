@@ -132,7 +132,7 @@ def predict(model_save_file, dataset_file, predict_result_file):
     with torch.no_grad():
         # sequences1 = torch.stack(sequences1, dim = 0)
         # sequences2 = torch.tensor(sequences2, dtype=torch.long)
-        predictions = model(sequences1, sequences2, real_dis_tensor)
+        predictions = model(sequences1.to(device), sequences2.to(device), real_dis_tensor.to(device))
         predict_distances = predictions.tolist()
         # print(f"Precited distances: {predict_distances}")
 
