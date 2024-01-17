@@ -140,7 +140,6 @@ def predict(model_save_file, dataset_file, predict_result_file, the_device = "cp
     with torch.no_grad():
         predictions = model(sequences1, sequences2, real_dis_tensor)
         predict_distances = predictions.tolist()
-        # print(f"Precited distances: {predict_distances}")
 
     with open(predict_result_file, 'w') as fout:
         fout.write(f"protein1_pdb\tprotein2_pdb\tprotein1_classification\tprotein2_classfication\treal_distance\tpredict_distance\tdiff\n")
@@ -159,71 +158,3 @@ def predict(model_save_file, dataset_file, predict_result_file, the_device = "cp
             fout.write(f"{line}\n")
 
     print(f"\n=************= Finished predicting.\n")
-
-
-
-def batch_predict(model_save_file, dataset_file, predict_result_file, device = "cpu", the_batch_size = 32):
-    print(f"=************= Start predicting...\n")
-
-    the_embedding_dim = 128
-    the_hidden_dim = 128
-    
-    # Set the model to evaluation mode (important if you have dropout layers)
-    model = ProteinDistanceModel(
-        embedding_dim=the_embedding_dim, 
-        hidden_dim=the_hidden_dim
-    )
-    
-    if device == "cpu":
-        model.load_state_dict(torch.load(model_save_file, map_location=torch.device(device)))
-        print(f"Loaded the trained model on cpu successfully.\n")
-    else:
-        model.load_state_dict(torch.load(model_save_file))
-        print(f"Loaded the trained model on gpu successfully.\n")
-
-    model.eval()
-
-    print(f"Start loading dataset from {dataset_file}.\n")
-    # sequences1, sequences2, distances = load_dataset(dataset_file)
-    sequences1, sequences2, distances, test_sets = load_test_data(dataset_file)
-    print(f"Successfully loaded dataset with {len(sequences1)} sequences1, \
-        {len(sequences2)} sequences2, \
-        and {len(distances)} distances.\n")
-
-    # Create dataset and DataLoader
-    dataset = ProteinDataset(sequences1, sequences2, distances)
-    validate_loader = DataLoader(
-        dataset, 
-        batch_size=the_batch_size, 
-        shuffle=False, 
-        collate_fn=lambda batch: pad_collate(batch, device)
-    )
-
-    # Make predictions
-    with torch.no_grad(), open(predict_result_file, 'w') as fout:
-        fout.write(f"protein1_pdb\tprotein2_pdb\tprotein1_classification\tprotein2_classfication\treal_distance\tpredict_distance\tdiff\n")
-        info_index = 0
-        for seq1, seq2, distance in validate_loader:
-            print(f"Start new batch predicting.")
-            predictions = model(seq1.to(device), seq2.to(device), distance.to(device))
-            predict_distances = predictions.tolist()
-
-            for i in range(0, len(predict_distances)):
-                cur_record = test_sets[i]
-                pro1 = cur_record["protein1_pdb"]
-                pro2 = cur_record["protein2_pdb"]
-                pro1_class = cur_record["protein1_classification"]
-                pro2_class = cur_record["protein2_classfication"]
-                real_distance = cur_record["distance"]
-                predict_distance = predict_distances[i]
-                diff = predict_distance[0] - real_distance
-                
-                line = f"{pro1}\t{pro2}\t{pro1_class}\t{pro2_class}\t{real_distance}\t{predict_distance}\t{diff}"
-                print(line)
-                fout.write(f"{line}\n")
-
-                info_index += 1
-
-    print(f"\n=************= Finished predicting.\n")
-
-
