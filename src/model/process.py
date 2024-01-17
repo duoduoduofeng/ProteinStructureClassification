@@ -111,7 +111,7 @@ def train(dataset_file, model_save_file, train_log, epoch_times = 10, the_batch_
 
 
 
-def predict(model_save_file, dataset_file, predict_result_file, device = "cpu"):
+def predict(model_save_file, dataset_file, predict_result_file, the_device = "cpu"):
     print(f"=************= Start predicting...\n")
 
     the_embedding_dim = 128
@@ -122,8 +122,8 @@ def predict(model_save_file, dataset_file, predict_result_file, device = "cpu"):
         embedding_dim=the_embedding_dim, 
         hidden_dim=the_hidden_dim)
     
-    if device == "cpu":
-        model.load_state_dict(torch.load(model_save_file, map_location=torch.device(device)))
+    if the_device == "cpu":
+        model.load_state_dict(torch.load(model_save_file, map_location=torch.device(the_device)))
         print(f"Loaded the trained model on cpu successfully.\n")
     else:
         model.load_state_dict(torch.load(model_save_file))
@@ -132,9 +132,9 @@ def predict(model_save_file, dataset_file, predict_result_file, device = "cpu"):
     model.eval()
 
     sequences1, sequences2, real_dis_tensor, selected_test_set = load_test_data(dataset_file)
-    # sequences1 = sequences1.to(device)
-    # sequences2 = sequences2.to(device)
-    # real_dis_tensor = real_dis_tensor.to(device)
+    # sequences1 = sequences1.to(the_device)
+    # sequences2 = sequences2.to(the_device)
+    # real_dis_tensor = real_dis_tensor.to(the_device)
 
     # Make predictions
     with torch.no_grad():
