@@ -122,12 +122,12 @@ def predict(model_save_file, dataset_file, predict_result_file, the_device = "cp
         embedding_dim=the_embedding_dim, 
         hidden_dim=the_hidden_dim)
     
-    if the_device == "cpu":
-        model.load_state_dict(torch.load(model_save_file, map_location=torch.device(the_device)))
-        print(f"Loaded the trained model on cpu successfully.\n")
-    else:
+    if the_device != "cpu":
         model.load_state_dict(torch.load(model_save_file))
         print(f"Loaded the trained model on gpu successfully.\n")
+    else:
+        model.load_state_dict(torch.load(model_save_file, map_location=torch.device(the_device)))
+        print(f"Loaded the trained model on cpu successfully.\n")
 
     model.eval()
 
