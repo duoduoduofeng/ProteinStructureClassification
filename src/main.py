@@ -38,4 +38,4 @@ if __name__ == "__main__":
     #model_save_file = f"{common_path}/models/trained_model.dict.20240111_024648"
 
     predict_result_file = f"{common_path}/result/predict_result.txt"
-    predict(model_save_file, validate_dataset_file, predict_result_file)
+    predict(model_save_file, validate_dataset_file, predict_result_file, device)
