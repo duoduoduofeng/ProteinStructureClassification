@@ -122,7 +122,7 @@ def predict(model_save_file, dataset_file, predict_result_file, device = "cpu"):
         embedding_dim=the_embedding_dim, 
         hidden_dim=the_hidden_dim)
     if device == "cpu":
-        model.load_state_dict(torch.load(model_save_file, map_location=torch.device('cpu')))
+        model.load_state_dict(torch.load(model_save_file, map_location=torch.device(device)))
         print(f"Loaded the trained model on cpu successfully.\n")
     else:
         model.load_state_dict(torch.load(model_save_file))
@@ -131,12 +131,13 @@ def predict(model_save_file, dataset_file, predict_result_file, device = "cpu"):
     model.eval()
 
     sequences1, sequences2, real_dis_tensor, selected_test_set = load_test_data(dataset_file)
+    sequences1 = sequences1.to(device)
+    sequences2 = sequences2.to(device)
+    real_dis_tensor = real_dis_tensor.to(device)
 
     # Make predictions
     with torch.no_grad():
-        # sequences1 = torch.stack(sequences1, dim = 0)
-        # sequences2 = torch.tensor(sequences2, dtype=torch.long)
-        predictions = model(sequences1.to(device), sequences2.to(device), real_dis_tensor.to(device))
+        predictions = model(sequences1, sequences2, real_dis_tensor)
         predict_distances = predictions.tolist()
         # print(f"Precited distances: {predict_distances}")
 

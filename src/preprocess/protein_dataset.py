@@ -183,6 +183,6 @@ def load_test_data(dataset_file):
     sequences1 = pad_sequence(sequences1, batch_first=True)
     sequences2 = pad_sequence(sequences2, batch_first=True)
 
-    real_dis_tensor = torch.tensor(distances, dtype=torch.float32).view(-1, 1)
+    real_dis_tensor = torch.tensor(distances, dtype=torch.float16).view(-1, 1)
 
     return sequences1, sequences2, real_dis_tensor, test_sets
