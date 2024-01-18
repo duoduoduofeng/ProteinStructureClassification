@@ -22,7 +22,8 @@ def evaluation(model, data_loader, criterion):
     return avg_loss
 
 
-def train(dataset_file, model_save_file, train_log, epoch_times = 10, the_batch_size = 256, device = "cpu"):
+def train(dataset_file, model_save_file, train_log, the_device = 'cpu', epoch_times = 10, the_batch_size = 256):
+    device = torch.device(the_device)
     # Some hyperparameters
     split_rate = 0.8
 

@@ -213,7 +213,7 @@ def load_seqs(sequences_file_dir):
 
 
 def measure_distance(cl1, cl2):
-	distance = 8
+	distance = 16
 
 	if cl1["rep_id"] == cl2["rep_id"]:
 		distance = 0
@@ -224,9 +224,9 @@ def measure_distance(cl1, cl2):
 	elif cl1["CF"] == cl2["CF"]:
 		distance = 4
 	elif cl1["CL"] == cl2["CL"]:
-		distance = 4
-	# elif cl1["TP"] == cl2["TP"]:
-	# 	distance = 8/16
+		distance = 8
+	elif cl1["TP"] == cl2["TP"]:
+		distance = 8
 
 	return distance
 
@@ -290,6 +290,57 @@ def build_pair(reserved_proteins, keys, seqs, output_file):
 		print(f"invalid_1_count = {invalid_1_count}, invalid_2_count = {invalid_2_count}")
 
 
+"""
+Build the pair data.
+"""
+def build_pair2(reserved_proteins, keys, seqs, output_file):
+	# Obtain the selected proteins' sequences at first
+	thesequences = {}
+	empty_sequences_count = 0
+	for thekey in keys:
+		info = reserved_proteins[thekey]
+		
+		# Locate the sequence file
+		sequence_file_row_num = info["sequence_file_row_num"]
+		if sequence_file_row_num % 1000 != 0:
+			start_row = math.floor(sequence_file_row_num/1000) * 1000 + 1
+			end_row = math.floor(sequence_file_row_num/1000) * 1000 + 1000
+		else:
+			start_row = (int(sequence_file_row_num/1000)-1) * 1000 + 1
+			end_row = int(sequence_file_row_num/1000) * 1000
+
+		dict_name = f"protein_sequences.{start_row}.{end_row}"
+		if thekey not in seqs[dict_name]:
+			empty_sequences_count += 1
+			continue
+		thesequences[thekey] = seqs[dict_name][thekey]
+
+	print(f"There are {empty_sequences_count} proteins failed to request the PDB sequences.")
+
+	with open(output_file, 'w') as fout:
+		invalid_1_count = 0
+		invalid_2_count = 0
+		fout.write(f"protein1_pdb\tprotein2_pdb\tdistance\tprotein1_seq\tprotein2_seq\tprotein1_classification\tprotein2_classfication\n")
+		
+		all_keys = list(thesequences.keys())
+		pair_count = 0
+		for i, pro1 in enumerate(all_keys):
+		    for pro2 in all_keys[i+1:]:
+		    	pair_count += 1
+		    	if pro1 == pro2:
+		    		invalid_1_count += 1
+		    	elif thesequences[pro1] == thesequences[pro2]:
+		    		invalid_2_count += 1
+		    	else:
+		    		cl1 = reserved_proteins[pro1]
+		    		cl2 = reserved_proteins[pro2]
+		    		distance = measure_distance(cl1, cl2)
+		    		fout.write(f"{pro1}\t{pro2}\t{distance}\t{thesequences[pro1]}\t{thesequences[pro2]}\t{json.dumps(reserved_proteins[pro1])}\t{json.dumps(reserved_proteins[pro2])}\n")
+		# 510832666
+		print(f"There are {pair_count} pairs of protein selected in total.")
+		print(f"invalid_1_count = {invalid_1_count}, invalid_2_count = {invalid_2_count}")
+
+
 if __name__ == "__main__":
 	meta_info = [
 	    {
@@ -324,9 +375,11 @@ if __name__ == "__main__":
 
 	### Step 6, when build pair, remember to filter the pair with the same sequences (or key names)
 	# awk -F '\t' '{print $3}' sample_proteins_dataset.train.txt | sort | uniq -c
-	train_set_file = "../../generated_data/whole_pdbs/datasets/try_tp_4/sample_proteins_dataset.train.txt"
-	build_pair(reserved_proteins, train_keys, seqs, train_set_file)
-	validate_set_file = "../../generated_data/whole_pdbs/datasets/try_tp_4/sample_proteins_dataset.validate.txt"
-	build_pair(reserved_proteins, validate_keys, seqs, validate_set_file)
+	train_set_file = "../../generated_data/whole_pdbs/datasets/try_tp_3/sample_proteins_dataset.train.txt"
+	build_pair2(reserved_proteins, train_keys, seqs, train_set_file)
+	validate_set_file = "../../generated_data/whole_pdbs/datasets/try_tp_3/sample_proteins_dataset.validate.txt"
+	build_pair2(reserved_proteins, validate_keys, seqs, validate_set_file)
+	excluded_validate_set_file = "../../generated_data/whole_pdbs/datasets/try_tp_3/sample_proteins_dataset.excluded_validate.txt"
+	build_pair2(reserved_proteins, excluded_validate_keys, seqs, excluded_validate_set_file)
 
 
