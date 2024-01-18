@@ -34,5 +34,5 @@ if __name__ == "__main__":
 
     ### 2. Prediction
     validate_dataset_file = f"{common_path}/data/sample_proteins_dataset.validate.txt"
-    predict_result_file = f"{common_path}/result/predict_result.txt"
+    predict_result_file = f"{common_path}/result/predict_result.txt.{dt_object}"
     predict(model_save_file, validate_dataset_file, predict_result_file, the_device)
