@@ -69,17 +69,27 @@ def load_rs(rs_file):
 					precision_dict[discrete_predict_distance]["wrong"] = 0
 				precision_dict[discrete_predict_distance]["wrong"] += 1
 
+	whole_right = 0
+	whole_wrong = 0
 	for va in recall_dict:
 		if "right" not in recall_dict[va]:
 			recall_dict[va]["right"] = 0
 		recall_dict[va]["recall"] = float(recall_dict[va]["right"]/(recall_dict[va]["right"] + recall_dict[va]["wrong"]))
 		recall_dict[va]["recall"] = round(recall_dict[va]["recall"], 2)
+		
+		whole_right += recall_dict[va]["right"]
+		whole_wrong += recall_dict[va]["wrong"]
+	recall_dict["whole_recall"] = float(whole_right / (whole_right + whole_wrong))
 
 	for va in precision_dict:
 		if "right" not in precision_dict[va]:
 			precision_dict[va]["right"] = 0
 		precision_dict[va]["precision"] = float(precision_dict[va]["right"]/(precision_dict[va]["right"] + precision_dict[va]["wrong"]))
 		precision_dict[va]["precision"] = round(precision_dict[va]["precision"], 2)
+
+		whole_right += precision_dict[va]["right"]
+		whole_wrong += precision_dict[va]["wrong"]
+	precision_dict["whole_precision"] = float(whole_right / (whole_right + whole_wrong))
 	
 	return recall_dict, precision_dict
 
