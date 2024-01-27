@@ -73,11 +73,13 @@ def load_rs(rs_file):
 		if "right" not in recall_dict[va]:
 			recall_dict[va]["right"] = 0
 		recall_dict[va]["recall"] = float(recall_dict[va]["right"]/(recall_dict[va]["right"] + recall_dict[va]["wrong"]))
+		recall_dict[va]["recall"] = round(recall_dict[va]["recall"], 2)
 
 	for va in precision_dict:
 		if "right" not in precision_dict[va]:
 			precision_dict[va]["right"] = 0
 		precision_dict[va]["precision"] = float(precision_dict[va]["right"]/(precision_dict[va]["right"] + precision_dict[va]["wrong"]))
+		precision_dict[va]["precision"] = round(precision_dict[va]["precision"], 2)
 	
 	return recall_dict, precision_dict
 
