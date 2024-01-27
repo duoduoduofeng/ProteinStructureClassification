@@ -80,6 +80,7 @@ def load_rs(rs_file):
 		whole_right += recall_dict[va]["right"]
 		whole_wrong += recall_dict[va]["wrong"]
 	recall_dict["whole_recall"] = float(whole_right / (whole_right + whole_wrong))
+	recall_dict["whole_recall"] = round(recall_dict["whole_recall"], 2)
 
 	for va in precision_dict:
 		if "right" not in precision_dict[va]:
@@ -90,6 +91,7 @@ def load_rs(rs_file):
 		whole_right += precision_dict[va]["right"]
 		whole_wrong += precision_dict[va]["wrong"]
 	precision_dict["whole_precision"] = float(whole_right / (whole_right + whole_wrong))
+	precision_dict["whole_precision"] = round(precision_dict["whole_precision"], 2)
 	
 	return recall_dict, precision_dict
 
