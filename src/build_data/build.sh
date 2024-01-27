@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# mode="train"
-mode="validate"
+# mode="small_amount/train"
+# mode="small_amount/validate"
+mode="small_amount/mix_seqs" # only used for mixing known and unknown proteins
 
 # 1. merge_full_fields.py
 merged_data_file_name="../../generated_data/scop-protein-whole-info.txt"
@@ -16,7 +17,7 @@ sampled_fa_pros_file_name="../../generated_data/$mode/scop-fa-sample.txt"
 # theseed=102
 theseed=1018
 
-python3 sample_by_family.py $protein_file_name $count_file_name $sampled_fa_pros_file_name $theseed
+# python3 sample_by_family.py $protein_file_name $count_file_name $sampled_fa_pros_file_name $theseed
 
 
 # 3. request_pdb.py
@@ -24,7 +25,7 @@ input_file="../../generated_data/$mode/scop-fa-sample.txt"
 output_file="../../generated_data/$mode/protein_samples_seq.txt"
 err_file="../../generated_data/$mode/protein_samples_err.txt"
 
-python3 request_pdb.py $input_file $output_file $err_file
+# python3 request_pdb.py $input_file $output_file $err_file
 
 
 # 4. label_pair_distance.py
