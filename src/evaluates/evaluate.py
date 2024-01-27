@@ -1,5 +1,6 @@
 #!/bin/bash
 import json
+import sys
 
 
 def load_rs(rs_file):
@@ -82,7 +83,8 @@ def load_rs(rs_file):
 
 
 if __name__ == "__main__":
-	rs_file = "../../generated_data/whole_pdbs/datasets/try_tp_3/result/predict_result.validate.txt.20240119_014953"
+	# rs_file = "../../generated_data/whole_pdbs/datasets/try_tp_3/result/predict_result.validate.txt.20240119_014953"
+	rs_file = sys.argv[1]
 	recall_dict, precision_dict = load_rs(rs_file)
 	print(json.dumps(recall_dict))
 	print(json.dumps(precision_dict))
