@@ -28,7 +28,7 @@ def load_rs(rs_file):
 				discrete_predict_distance = 1
 			elif predict_distance <= 3.5:
 				discrete_predict_distance = 2
-				# print(line)
+				print(line)
 			elif predict_distance <= 6:
 				discrete_predict_distance = 4
 			elif predict_distance <= 12:
