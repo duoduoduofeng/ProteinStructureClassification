@@ -26,7 +26,9 @@ def count_by_dis(input_file):
 
 
 # The amount of pairs with distance 8 is too large, sample it to the second large set size.
-def sample_largest_set(input_file):
+def sample_largest_set(input_file, theseed = 2024):
+	random.seed(theseed)
+
 	output_file = f"{input_file}.tailored"
 	
 	stat_dict = count_by_dis(input_file)
@@ -36,7 +38,7 @@ def sample_largest_set(input_file):
 	largest_key = list(stat_dict.keys())[0]
 	second_largest_key = list(stat_dict.keys())[1]
 
-	sample_size = stat_dict[second_largest_key]
+	sample_size = int(stat_dict[second_largest_key] / 2)
 	probability = float(sample_size / stat_dict[largest_key])
 
 	with open(input_file, 'r') as fin, open(output_file, 'w') as fout:
@@ -69,5 +71,6 @@ def sample_largest_set(input_file):
 
 if __name__ == "__main__":
 	input_file = sys.argv[1]
-	sample_largest_set(input_file)
+	theseed = 2024
+	sample_largest_set(input_file, theseed)
 
