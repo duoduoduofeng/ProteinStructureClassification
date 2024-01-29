@@ -100,7 +100,8 @@ def train(dataset_file, model_save_file, train_log, the_device = 'cpu', epoch_ti
 
             # Evaluate on the test set
             avg_loss = evaluation(model, test_loader, criterion)
-            log_line = f"{datetime.now().strftime("%%Y-%%m-%%d %%H:%%M:%%S")}, Epoch {epoch + 1}, Test Loss: {avg_loss:.4f}"
+            ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_line = f"{ts}, Epoch {epoch + 1}, Test Loss: {avg_loss:.4f}"
             print(log_line)
             fout.write(f"{log_line}\n")
 
