@@ -20,8 +20,8 @@ def load_rs(rs_file):
 			predict_distance = json.loads(parts[5])[0]
 			discrete_predict_distance = -1
 
-			if real_distance == 0:
-				print(line)
+			# if real_distance == 0:
+				# print(line)
 
 			if predict_distance <= 0.5:
 				discrete_predict_distance = 0
@@ -29,7 +29,7 @@ def load_rs(rs_file):
 				discrete_predict_distance = 1
 			elif predict_distance <= 3.5:
 				discrete_predict_distance = 2
-				print(line)
+				# print(line)
 			elif predict_distance <= 6:
 				discrete_predict_distance = 4
 			elif predict_distance <= 12:
@@ -74,22 +74,30 @@ def load_rs(rs_file):
 	for va in recall_dict:
 		if "right" not in recall_dict[va]:
 			recall_dict[va]["right"] = 0
+		if "wrong" not in recall_dict[va]:
+			recall_dict[va]["wrong"] = 0
+		
 		recall_dict[va]["recall"] = float(recall_dict[va]["right"]/(recall_dict[va]["right"] + recall_dict[va]["wrong"]))
 		recall_dict[va]["recall"] = round(recall_dict[va]["recall"], 2)
 		
 		whole_right += recall_dict[va]["right"]
 		whole_wrong += recall_dict[va]["wrong"]
+	
 	recall_dict["whole_recall"] = float(whole_right / (whole_right + whole_wrong))
 	recall_dict["whole_recall"] = round(recall_dict["whole_recall"], 2)
 
 	for va in precision_dict:
 		if "right" not in precision_dict[va]:
 			precision_dict[va]["right"] = 0
+		if "wrong" not in precision_dict[va]:
+			precision_dict[va]["wrong"] = 0
+		
 		precision_dict[va]["precision"] = float(precision_dict[va]["right"]/(precision_dict[va]["right"] + precision_dict[va]["wrong"]))
 		precision_dict[va]["precision"] = round(precision_dict[va]["precision"], 2)
 
 		whole_right += precision_dict[va]["right"]
 		whole_wrong += precision_dict[va]["wrong"]
+	
 	precision_dict["whole_precision"] = float(whole_right / (whole_right + whole_wrong))
 	precision_dict["whole_precision"] = round(precision_dict["whole_precision"], 2)
 	
