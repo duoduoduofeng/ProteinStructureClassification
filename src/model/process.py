@@ -1,3 +1,4 @@
+from datetime import datetime
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -99,7 +100,7 @@ def train(dataset_file, model_save_file, train_log, the_device = 'cpu', epoch_ti
 
             # Evaluate on the test set
             avg_loss = evaluation(model, test_loader, criterion)
-            log_line = f"Epoch {epoch + 1}, Test Loss: {avg_loss:.4f}"
+            log_line = f"{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}, Epoch {epoch + 1}, Test Loss: {avg_loss:.4f}"
             print(log_line)
             fout.write(f"{log_line}\n")
 
